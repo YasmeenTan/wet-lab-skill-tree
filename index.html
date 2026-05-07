@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wet Lab Skill Tree</title>
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">    
+    <style>
+        /* --- GAMER THEME CSS --- */
+body { 
+        background-color: #202020; 
+        color: #ffffff;
+        font-family: 'Press Start 2P', cursive; /* The 8-bit font */
+        line-height: 1.6;
+        padding: 20px;
+        image-rendering: pixelated;
+    }
+
+    h1 { 
+        font-size: 30px; 
+        color: #ffcc00; 
+        text-shadow: 4px 4px #000;
+        margin-bottom: 40px;
+    }
+
+    .tree-container { 
+        display: flex; 
+        justify-content: center; 
+        gap: 80px; 
+        flex-wrap: wrap; 
+    }
+
+    /* --- THE 8-BIT TREE STRUCTURE --- */
+    /* Centering the entire branch column */
+    .branch { 
+        position: relative; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;      /* This centers the Stage header and the skill boxes */
+        padding-top: 20px;
+    }
+
+    /* The vertical "Trunk" */
+    .branch::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%); /* Perfectly centers the 8px trunk */
+        top: 60px;                  /* Starts the line below the Stage header */
+        bottom: 0;
+        width: 12px;                /* Made it a bit thicker for that chunky look */
+        background: #5a3d2b; 
+        box-shadow: 4px 0px #3e2a1e;
+        z-index: -1;                /* PUSHES THE LINE BEHIND THE BOXES */
+    }
+
+    .skill {
+        position: relative;
+        background: #404040;
+        /* Retro "Double" Border Effect */
+        border: 4px solid #fff;
+        box-shadow: 6px 6px 0px #000;
+        padding: 15px;
+        margin: 40px 0;
+        width: 240px;
+        text-align: center;
+        font-size: 12px; /* Small font for 8-bit look */
+        z-index: 1;
+        transition: transform 0.1s;
+    }
+
+    /* Horizontal "Twig" connecting node to trunk */
+    .skill::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -15px;
+        width: 15px;
+        height: 8px;
+        background: #5a3d2b;
+    }
+
+    /* --- GAME STATES --- */
+    .unlocked { 
+        background: #38b000; /* Retro Green */
+        border-color: #ccff33;
+    }
+
+    .unlocked:hover {
+        transform: scale(1.1) rotate(-2deg);
+        background: #70e000;
+    }
+
+    .locked { 
+        background: #808080; 
+        border-color: #404040;
+        opacity: 0.8;
+    }
+
+    /* Hide descriptions until hover */
+    .description {
+        display: none;
+        background: #000;
+        padding: 10px;
+        margin-top: 10px;
+        border: 2px dashed #fff;
+    }
+
+    .skill:hover .description {
+        display: block;
+    }
+
+    /* Custom Checkbox Appearance */
+    input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    #searchBar {
+        border: 4px solid #fff;
+        background: #000;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 8px;
+        padding: 10px;
+        box-shadow: 4px 4px 0px #000;
+    }
+
+    .btn-reset {
+        background: #e63946;
+        border: 4px solid #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 8px;
+        color: #fff;
+        box-shadow: 4px 4px 0px #000;
+        padding: 10px;
+    }
+
+    .btn-reset:hover {
+        background: #b91c1c;
+        transform: translateY(-2px);
+    }
+    
+    .achievement-card {
+        background: #ffd700;
+        color: #000;
+        padding: 10px;
+        border: 4px solid #fff;
+        box-shadow: 4px 4px 0px #000;
+        font-size: 12px; /* Matching the 8-bit theme */
+        display: flex;
+        align-items: center;
+        /* This animation only runs once when the div is added to the DOM */
+        animation: achievementPop 0.4s ease-out;
+    }
+
+    @keyframes achievementPop {
+        0% { transform: translateY(-20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .achievement-card i {
+        margin-right: 8px;
+    }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>Wet Lab Skill Tree</h1>
+        <div id="achievement-rack" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; min-height: 50px;">
+            <!-- Achievements will pop up here -->
+        </div>
+        <div class="controls">
+            <input type="text" id="searchBar" placeholder="Search protocol..." onkeyup="searchSkills()">
+            <button onclick="resetProgress()" class="btn-reset">Reset Protocol</button>
+        </div>
+    </div>
+
+    <div class="tree-container" id="main-tree">
+        <!-- SKILLS LOADING... -->
+    </div>
+
+    <script>
+        async function loadSkillTree() {
+            try {
+                const response = await fetch('./skills.json');
+                const data = await response.json();
+                const container = document.getElementById('main-tree');
+                container.innerHTML = '';
+
+                data.branches.forEach((branchData, bIndex) => {
+                    const branchDiv = document.createElement('div');
+                    branchDiv.className = 'branch';
+                    
+                    // --- THIS IS THE VISUAL LAYOUT UPDATE ---
+                    // It makes the branch titles look like 8-bit "Stage" headers
+                    branchDiv.innerHTML = `
+                        <h2 style="background:#fff; color:#000; padding:10px; font-size:15px; border: 4px solid #000; display: inline-block;">
+                            STAGE: ${branchData.title}
+                        </h2>
+                    `;
+
+                    branchData.skills.forEach((skill, sIndex) => {
+                        const skillDiv = document.createElement('div');
+                        const uniqueId = `b${bIndex}-s${sIndex}`;
+                        
+                        skillDiv.className = `skill ${sIndex === 0 ? 'unlocked' : 'locked'}`;
+                        skillDiv.id = `box-${uniqueId}`;
+
+                        skillDiv.innerHTML = `
+                            <input type="checkbox" id="check-${uniqueId}" data-skill-id="${skill.id}"
+                                onclick="handleToggle('${uniqueId}', ${bIndex}, ${sIndex})">
+                            <label for="check-${uniqueId}" style="cursor:pointer; display:block; margin-top:12px;">
+                                <i class="fas ${skill.icon}"></i> ${skill.label}
+                            </label>
+                            <div class="description">PRO-TIP: ${skill.tip}</div>
+                        `;
+                        branchDiv.appendChild(skillDiv);
+                    });
+                    container.appendChild(branchDiv);
+                });
+            } catch (error) {
+                console.error("Error loading skills:", error);
+            }
+        }
+
+        // SEARCH & RESET
+        function searchSkills() {
+            const term = document.getElementById('searchBar').value.toLowerCase();
+            document.querySelectorAll('.skill').forEach(s => {
+                s.classList.toggle('search-match', term && s.innerText.toLowerCase().includes(term));
+            });
+        }
+
+        function resetProgress() {
+            if (confirm("ERASE ALL SAVE DATA?")) {
+                localStorage.removeItem('labSkillTree');
+                document.getElementById('achievement-rack').innerHTML = ''; // Clear trophies
+                location.reload();
+            }
+        }
+
+        function checkAchievements() {
+            const rack = document.getElementById('achievement-rack');
+
+            document.querySelectorAll('.branch').forEach(branch => {
+                // Clean the title (removes emojis and extra spaces)
+                const rawTitle = branch.querySelector('h2').innerText.replace('STAGE: ', '');
+                const cleanTitle = rawTitle.replace(/[^\x00-\x7F]/g, "").trim(); 
+                
+                const allCheckboxes = branch.querySelectorAll('input[type="checkbox"]');
+                const checkedCount = branch.querySelectorAll('input[type="checkbox"]:checked').length;
+                const isComplete = (checkedCount > 0 && checkedCount === allCheckboxes.length);
+                
+                const achId = `ach-${cleanTitle.replace(/\s+/g, '-')}`;
+                const existingAch = document.getElementById(achId);
+
+                if (isComplete) {
+                    // Only create it if it doesn't already exist in the rack
+                    if (!existingAch) {
+                        const achName = getAchievementName(cleanTitle);
+                        const trophy = document.createElement('div');
+                        trophy.id = achId; // Unique ID so we don't duplicate it
+                        trophy.className = 'achievement-card';
+                        trophy.innerHTML = `<i class="fas fa-trophy"></i> ${achName}`;
+                        rack.appendChild(trophy);
+                    }
+                } else {
+                    // If they uncheck a skill, remove the trophy
+                    if (existingAch) {
+                        existingAch.remove();
+                    }
+                }
+            });
+        }
+
+        function getAchievementName(title) {
+            // These must match your JSON titles (minus emojis) exactly
+            const names = {
+                "Cell Culture": "HAPPY CELL PARENT",
+                "Molecular Bio": "GENE-IUS",
+                "Advanced Imaging": "PIXEL PERFECT",
+                "Biochemistry": "PROTEIN PRO",
+                "Histology": "TISSUE TITAN",
+                "Data Science": "DATA OVERLORD"
+            };
+            return names[title] || `${title} CLEAR!`;
+        }
+
+        // TOGGLE LOGIC (Supports Merging/Syncing)
+        function handleToggle(uniqueId, branchIndex, skillIndex) {
+            const currentCheck = document.getElementById(`check-${uniqueId}`);
+            const skillId = currentCheck.getAttribute('data-skill-id');
+            const isChecked = currentCheck.checked;
+
+            const allSameSkills = document.querySelectorAll(`input[data-skill-id="${skillId}"]`);
+            
+            allSameSkills.forEach(input => {
+                input.checked = isChecked;
+                
+                const currentIdParts = input.id.split('-s');
+                const nextSkillId = `${currentIdParts[0]}-s${parseInt(currentIdParts[1]) + 1}`;
+                const nextBox = document.getElementById(`box-${nextSkillId.replace('check-', '')}`);
+
+                if (nextBox) {
+                    if (isChecked) {
+                        nextBox.classList.remove('locked');
+                        nextBox.classList.add('unlocked');
+                    } else {
+                        nextBox.classList.add('locked');
+                        nextBox.classList.remove('unlocked');
+                        const nextCheck = document.getElementById(nextSkillId);
+                        if (nextCheck && nextCheck.checked) {
+                            nextCheck.checked = false;
+                            handleToggle(nextSkillId.replace('check-', ''), branchIndex, parseInt(currentIdParts[1]) + 1);
+                        }
+                    }
+                }
+            });
+            // Put this at the very end of handleToggle()
+            checkAchievements();
+        }
+
+        // RUN THE ENGINE
+        loadSkillTree();
+    </script>
+</body>
+</html>

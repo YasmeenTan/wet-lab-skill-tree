@@ -1,0 +1,53 @@
+{
+    "branches": [
+      {
+        "title": "🧬 Molecular Bio",
+        "achievement": "GENE-IUS",
+        "skills": [
+          { "id": "pipette", "label": "Pipetting Master", "icon": "fa-dropper", "tip": "Calibrate often." },
+          { "id": "pcr", "label": "PCR Basics", "icon": "fa-temperature-high", "tip": "Avoid contamination." },
+          { "id": "bioinfo", "label": "Bioinformatics", "icon": "fa-laptop-code", "tip": "Analyze your PCR results." }
+        ]
+      },
+      {
+        "title": "💻 Data Science",
+        "achievement": "DATA OVERLOAD",
+        "skills": [
+          { "id": "bioinfo", "label": "Bioinformatics", "icon": "fa-laptop-code", "tip": "Can be started as a standalone path." }
+        ]
+      },
+      {
+        "title": "🧫 Cell Culture",
+        "achievement": "HAPPY CELL PARENT",
+        "skills": [
+          { "id": "aseptic", "label": "Aseptic Technique", "icon": "fa-wind", "tip": "Always work 6 inches inside the hood." },
+          { "id": "passaging", "label": "Cell Passaging", "icon": "fa-vial", "tip": "Check confluency under the scope daily." },
+          { "id": "transfection", "label": "Transfection", "icon": "fa-dna", "tip": "Monitor cell health 24h post-transfection." },
+          { "id": "betagal", "label": "Beta-Gal Staining", "icon": "fa-eye", "tip": "A classic assay for detecting cellular senescence." }
+        ]
+      },
+      {
+        "title": "🔬 Advanced Imaging",
+        "achievement": "PIXEL PERFECT",
+        "skills": [
+          { "id": "confocal", "label": "Confocal Microscopy", "icon": "fa-microscope", "tip": "Use the pinhole to eliminate out-of-focus light." },
+          { "id": "imaris", "label": "Imaris Analysis", "icon": "fa-cube", "tip": "Perform 3D rendering and surface mapping." }
+        ]
+      },
+      {
+        "title": "🧪 Biochemistry",
+        "achievement": "PROTEIN PRO",
+        "skills": [
+          { "id": "bca_assay", "label": "NAD/BCA Assay", "icon": "fa-flask-vial", "tip": "Use a standard curve to quantify protein concentration." },
+          { "id": "proteomics", "label": "Proteomics", "icon": "fa-atom", "tip": "Prep samples for Mass Spec using trypsin digestion." }
+        ]
+      },
+      {
+        "title": "🔪 Histology",
+        "achievement": "TISSUE TITAN",
+        "skills": [
+          { "id": "tissue_prep", "label": "Tissue Preparation", "icon": "fa-scissors", "tip": "Master fixation, dehydration, and embedding." }
+        ]
+      }
+    ]
+}
